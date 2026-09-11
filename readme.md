@@ -57,7 +57,13 @@ cd Servicio-de-Prestamos
 
 Si el proyecto ya esta descargado, basta con abrir una terminal en la carpeta `Servicio-de-Prestamos`.
 
-### 2. Instalar dependencias
+### 2. Generar el archivo de configuracion
+
+```bash
+cp .env.example .env
+```
+
+### 3. Instalar dependencias
 
 ```bash
 npm install
@@ -65,7 +71,7 @@ npm install
 
 Este comando instala las dependencias definidas en `package.json` y genera o actualiza `package-lock.json`.
 
-### 3. Configuracion opcional
+### 4. Configuracion opcional
 
 El repositorio incluye `.env.example` como plantilla para futuras variables de entorno. La version actual no requiere configuracion adicional para ejecutarse.
 
