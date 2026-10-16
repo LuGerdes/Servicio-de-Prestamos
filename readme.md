@@ -105,6 +105,7 @@ Usuario ─── solicita ─── Prestamo ─── corresponde a ─── 
 
 ## Estructura del proyecto
 
+```text
 Servicio-de-Prestamos/
 ├── .env.example
 ├── .gitignore
