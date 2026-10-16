@@ -1,180 +1,134 @@
-# Sistema de Prestamos de Libros y Juegos de Mesa
+# Sistema de Préstamos de Libros y Juegos de Mesa
 
-Proyecto para modelar el dominio y las reglas basicas de un sistema de prestamos. Es una aplicacion de consola desarrollada en JavaScript que relaciona usuarios con recursos prestables, controla la cantidad disponible y rechaza operaciones cuando no hay stock.
+Aplicación de consola desarrollada en JavaScript y Node.js para administrar usuarios, un catálogo de libros y juegos de mesa, y los préstamos de esos ítems. El sistema aplica reglas según el rol del usuario, controla el stock, calcula fechas límite y repone las unidades al registrar una devolución.
 
-## Integrantes del grupo
+## Integrantes
 
 - Gerdes Lourddes
 - Minor Santiago
 - Ho Fu Te
 
-## Definicion del sistema
+## Funcionalidades
 
-El sistema representa el proceso minimo de prestar un libro o juego de mesa a un usuario. Cada recurso tiene una cantidad disponible (`stock`). Al realizar un prestamo valido, el sistema descuenta una unidad, registra la fecha y devuelve la informacion basica de la operacion. Si el recurso no tiene unidades disponibles, se informa el problema mediante un error y el stock permanece sin cambios.
+- Registrar usuarios con rol de `admin` o `cliente`.
+- Crear libros y juegos de mesa mediante `ItemFactory`.
+- Agregar ítems al catálogo únicamente con un usuario administrador; se rechazan IDs duplicados.
+- Consultar el catálogo, buscar ítems por ID y filtrar por tipo.
+- Solicitar préstamos para clientes, siempre que haya stock disponible. Los administradores no pueden retirar ítems.
+- Asignar un plazo de 15 días a los libros y de 5 días a los juegos de mesa.
+- Registrar devoluciones, actualizar el estado del préstamo y reponer el stock.
+- Consultar los préstamos propios como cliente o el historial completo y los préstamos activos como administrador.
+- Registrar, buscar, listar y dar de baja usuarios; listar y dar de baja usuarios requiere permisos de administrador.
+- Manejar errores para operaciones no permitidas, recursos sin stock, IDs duplicados y registros inexistentes.
 
-## Caracteristicas del proyecto
+Los datos se mantienen en memoria durante la ejecución; el proyecto no utiliza una base de datos ni un servidor externo.
 
-- Modelado de usuarios mediante la entidad `Usuario`.
-- Modelado de libros y juegos de mesa mediante la entidad `Item`.
-- Prestamo de recursos con descuento automatico del stock.
-- Validacion de disponibilidad antes de modificar el inventario.
-- Manejo de errores cuando se intenta prestar un recurso agotado.
-- Registro de la fecha en cada prestamo exitoso.
-- Ejecucion sencilla desde la terminal, sin base de datos ni servidor externo.
+## Tecnologías y requisitos
 
-## Tecnologias usadas
-
-- **JavaScript:** lenguaje de implementacion.
-- **Node.js:** entorno de ejecucion de la aplicacion.
-- **npm:** administrador de paquetes y encargado del script de inicio.
-- **dotenv:** dependencia preparada para cargar variables de entorno en futuras configuraciones.
-
-## Requisitos necesarios
-
-- Node.js instalado, preferiblemente una version LTS.
+- Node.js (versión LTS recomendada).
 - npm, incluido normalmente con Node.js.
-- Git, solamente si se va a clonar el repositorio.
-- Terminal o consola de comandos.
+- Git, si se desea clonar el repositorio.
 
-Comprobar las versiones instaladas:
+Verifica las instalaciones con:
 
 ```bash
 node --version
 npm --version
-git --version
 ```
 
-## Instalacion
+## Instalación
 
-### 1. Obtener el proyecto
-
-Clonar el repositorio y entrar a su carpeta:
+Clona el repositorio y entra en la carpeta del proyecto:
 
 ```bash
 git clone https://github.com/LuGerdes/Servicio-de-Prestamos.git
 cd Servicio-de-Prestamos
 ```
 
-Si el proyecto ya esta descargado, basta con abrir una terminal en la carpeta `Servicio-de-Prestamos`.
-
-### 2. Generar el archivo de configuracion
-
-```bash
-cp .env.example .env
-```
-
-### 3. Instalar dependencias
+Instala las dependencias del proyecto:
 
 ```bash
 npm install
 ```
 
-Este comando instala las dependencias definidas en `package.json` y genera o actualiza `package-lock.json`.
+La aplicación no necesita configurar variables de entorno para la demostración actual.
 
-### 4. Configuracion opcional
+## Ejecución
 
-El repositorio incluye `.env.example` como plantilla para futuras variables de entorno. La version actual no requiere configuracion adicional para ejecutarse.
-
-## Ejecucion
-
-Iniciar la aplicacion con el script definido en npm:
+Inicia la simulación desde la terminal:
 
 ```bash
 npm start
 ```
 
-Tambien puede ejecutarse directamente con Node.js:
+También puedes ejecutarla directamente:
 
 ```bash
-node index.js
+node src/index.js
 ```
 
-## Funcionamiento actual
+La demostración registra usuarios, agrega un libro y un juego al catálogo, solicita préstamos, muestra errores controlados para operaciones no permitidas y devuelve un préstamo para reponer el stock.
 
-El archivo `index.js` realiza una demostracion automatica:
+## Pruebas
 
-1. Crea el usuario `Ana Perez`.
-2. Crea el item `Cien Anos de Soledad` con un stock inicial de una unidad.
-3. Realiza un prestamo exitoso y reduce el stock a cero.
-4. Intenta prestar nuevamente el mismo item.
-5. Captura y muestra el error de stock agotado.
+Jest se instala como dependencia de desarrollo. Desde la carpeta del proyecto, ejecuta en la consola:
 
-Salida esperada:
+```bash
+npm install --save-dev jest
+```
+
+Luego, ejecuta las pruebas con el script configurado en `package.json`:
+
+```bash
+npm test
+```
+
+El script `test` ejecuta Jest. En el estado actual del repositorio todavía no hay una carpeta `tests` ni archivos de prueba, por lo que primero se deben agregar pruebas para que Jest tenga casos que ejecutar.
+
+## Modelo y reglas principales
 
 ```text
-=== SISTEMA DE PRÉSTAMOS ===
-Stock inicial de "Cien Años de Soledad": 1
-✓ Préstamo exitoso: "Cien Años de Soledad" a Ana Pérez. Stock restante: 0
-Intentando prestar de nuevo sin stock...
-Error capturado correctamente: No hay stock disponible de: Cien Años de Soledad
+Usuario ─── solicita ─── Prestamo ─── corresponde a ─── Item
+                                                       ├── Libro
+                                                       └── JuegoDeMesa
 ```
 
-Actualmente no existe una interfaz interactiva: los datos de prueba estan definidos directamente en el codigo fuente y se muestran por consola.
-
-## Modelo del dominio
-
-```text
-Usuario 1 ─────── solicita ─────── 0..* Prestamo 0..* ─────── corresponde a ─────── 1 Item
-```
-
-### Usuario
-
-Persona que solicita un recurso en prestamo.
-
-| Atributo | Descripcion |
-| --- | --- |
-| `id` | Identificador del usuario |
-| `nombre` | Nombre de la persona |
-
-### Item
-
-Recurso que puede ser prestado, como un libro o un juego de mesa.
-
-| Atributo | Descripcion |
-| --- | --- |
-| `id` | Identificador del recurso |
-| `titulo` | Nombre del libro o juego |
-| `tipo` | Tipo de recurso, por ejemplo `Libro` o `Juego de mesa` |
-| `stock` | Cantidad disponible |
-
-### PrestamoService
-
-Servicio que contiene la regla principal del dominio. Su metodo `prestar(usuario, item)`:
-
-1. Verifica que `item.stock` sea mayor que cero.
-2. Reduce el stock en una unidad.
-3. Muestra la confirmacion del prestamo.
-4. Devuelve el usuario, el item y la fecha de la operacion.
-
-Cuando el stock es cero, lanza un error antes de modificar el item.
+- **Usuario:** tiene ID, nombre, correo y rol. El rol predeterminado es `cliente`.
+- **Item:** contiene ID, título, descripción, plazo del préstamo y stock. `Libro` y `JuegoDeMesa` heredan las operaciones para consultar disponibilidad, descontar stock y reponerlo.
+- **Libro:** plazo de préstamo de 15 días; puede incluir edad recomendada y género.
+- **JuegoDeMesa:** plazo de préstamo de 5 días; puede incluir características, edad recomendada y cantidad de jugadores.
+- **Prestamo:** registra usuario, ítem, fecha de inicio, fecha límite, fecha de devolución y estado (`activo` o `devuelto`). También permite consultar si un préstamo activo está vencido.
+- **ItemFactory:** crea libros o juegos de mesa a partir del tipo solicitado.
+- **CatalogoService:** gestiona el catálogo y aplica el permiso de administrador al agregar ítems.
+- **UsuarioService:** administra usuarios y protege las operaciones de listado y baja con permisos de administrador.
+- **PrestamoService:** aplica las reglas de préstamo y devolución, y controla qué préstamos puede consultar cada usuario.
 
 ## Estructura del proyecto
 
-```text
 Servicio-de-Prestamos/
-├── .env.example       # Plantilla para variables de entorno
-├── .gitignore         # Archivos excluidos del control de versiones
-├── index.js           # Entidades, servicio y demostracion por consola
-├── package.json       # Metadatos, dependencia y script de inicio
-├── package-lock.json  # Versiones exactas de dependencias
-└── readme.md          # Documentacion del proyecto
+├── .env.example
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── readme.md
+└── src/
+    ├── index.js
+    ├── models/
+    │   ├── ItemFactory.js
+    │   ├── items.js
+    │   ├── juegoDeMesa.js
+    │   ├── libro.js
+    │   ├── prestamo.js
+    │   └── usuario.js
+    └── services/
+        ├── catalogoService.js
+        ├── prestamoService.js
+        └── usuarioService.js
 ```
 
-## Alcance y decisiones del Taller 1
+## Alcance actual
 
-El alcance actual se concentra en identificar las entidades principales y demostrar una regla de negocio esencial: no se puede prestar un item sin stock. Para mantener el ejercicio simple, la informacion vive en memoria, la ejecucion es local y no se incorporan todavia persistencia, autenticacion ni una API.
-
-## Futuras mejoras
-
-- Crear un catalogo de varios libros y juegos de mesa.
-- Agregar operaciones de devolucion y reposicion del stock.
-- Permitir registrar, buscar y eliminar usuarios e items.
-- Validar datos de entrada y evitar prestamos duplicados.
-- Persistir la informacion en una base de datos.
-- Crear una API REST y una interfaz web.
-- Incorporar estados del prestamo, fechas limite y multas.
-- Agregar pruebas automatizadas unitarias y de integracion.
-- Configurar linting, integracion continua y cobertura de codigo.
+La aplicación es una demostración ejecutada desde consola. Los datos se crean en `src/index.js` y no se conservan después de finalizar el proceso. No incluye interfaz interactiva, persistencia en base de datos, API REST ni autenticación.
 
 ## Licencia
 
