@@ -83,8 +83,6 @@ Luego, ejecuta las pruebas con el script configurado en `package.json`:
 npm test
 ```
 
-El script `test` ejecuta Jest. En el estado actual del repositorio todavía no hay una carpeta `tests` ni archivos de prueba, por lo que primero se deben agregar pruebas para que Jest tenga casos que ejecutar.
-
 ## Modelo y reglas principales
 
 ```text
