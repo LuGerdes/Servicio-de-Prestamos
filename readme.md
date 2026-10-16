@@ -104,7 +104,7 @@ Usuario ─── solicita ─── Prestamo ─── corresponde a ─── 
 - **PrestamoService:** aplica las reglas de préstamo y devolución, y controla qué préstamos puede consultar cada usuario.
 
 ## Estructura del proyecto
-
+```text
 Servicio-de-Prestamos/
 ├── .env.example
 ├── .gitignore
