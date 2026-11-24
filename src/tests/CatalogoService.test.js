@@ -5,8 +5,8 @@ const Usuario = require('../models/usuario');
 describe('Pruebas unitarias sobre CatalogoService', () => {
   let catalogoService;
   let admin;
-  let cliente;
-
+  let cliente; 
+  
   beforeEach(() => {
     // Se inicializa un servicio limpio antes de cada prueba (sin estado residual)
     catalogoService = new CatalogoService();
@@ -26,5 +26,17 @@ describe('Pruebas unitarias sobre CatalogoService', () => {
     expect(nuevoLibro.titulo).toBe('Rayuela');
     expect(nuevoLibro.diasPrestamo).toBe(15);
     expect(catalogoService.obtenerCatalogo()).toHaveLength(1);
-    });
   });
+
+  test('Debe impedir que un cliente agregue un ítem al catálogo', () => {
+    expect(() => {
+      catalogoService.agregarItem(cliente, 'libro', {
+        id: 2,
+        titulo: 'El túnel',
+        descripcion: 'Novela',
+        stock: 3,
+        edadRecomendada: 16
+      });
+    }).toThrow(/no tiene permisos de administrador/);
+  });
+});

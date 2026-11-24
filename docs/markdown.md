@@ -51,3 +51,9 @@ Al devolverlo, el servicio busca el préstamo y comprueba que todavía esté act
 - `src/services/usuarioService.js`: administra los usuarios.
 - `src/index.js`: crea los servicios y ejecuta una demostración.
 - `src/tests/`: contiene pruebas de catálogo y préstamos.
+
+## 8. Calidad de código y limpieza
+
+Para el Taller III se incorporó ESLint como herramienta de análisis estático. La configuración se encuentra en `eslint.config.mjs` y distingue el código fuente de las pruebas de Jest.
+
+Se eliminó una importación sin uso de `Usuario` en `src/services/usuarioService.js`. Además, se amplió `src/tests/CatalogoService.test.js` con una prueba que verifica que los usuarios con rol `cliente` no puedan agregar ítems al catálogo.

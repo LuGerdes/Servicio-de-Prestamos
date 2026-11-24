@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint src",
+    "check": "npm run lint && npm test"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +16,10 @@
     "dotenv": "^17.4.2"
   },
   "devDependencies": {
-    "jest": "^30.5.2"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "jest": "^30.5.2",
+    "typescript-eslint": "^8.74.0"
   }
 }
