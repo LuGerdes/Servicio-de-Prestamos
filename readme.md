@@ -71,13 +71,7 @@ La demostración registra usuarios, agrega un libro y un juego al catálogo, sol
 
 ## Pruebas
 
-Jest se instala como dependencia de desarrollo. Desde la carpeta del proyecto, ejecuta en la consola:
-
-```bash
-npm install --save-dev jest
-```
-
-Luego, ejecuta las pruebas con el script configurado en `package.json`:
+Desde la carpeta del proyecto, ejecuta las pruebas con el script configurado en `package.json`:
 
 ```bash
 npm test
