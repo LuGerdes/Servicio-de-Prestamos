@@ -1,5 +1,4 @@
-// src/services/UsuarioService.js
-const Usuario = require('../models/usuario');
+
 
 class usuarioService {
   /**

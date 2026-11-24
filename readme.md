@@ -77,6 +77,27 @@ Desde la carpeta del proyecto, ejecuta las pruebas con el script configurado en 
 npm test
 ```
 
+Para ejecutar el análisis estático de calidad con ESLint:
+
+```bash
+npm run lint
+```
+
+Para ejecutar ESLint y luego Jest encadenados:
+
+```bash
+npm run check
+```
+
+## Calidad de Código y Limpieza
+
+Se configuró ESLint mediante `eslint.config.mjs` para realizar análisis estático sobre el código fuente y las pruebas.
+
+También se realizaron las siguientes mejoras de calidad:
+
+- Se eliminó la importación sin uso de `Usuario` en `src/services/usuarioService.js`.
+- Se amplió la suite de pruebas de `src/tests/CatalogoService.test.js` para comprobar que un usuario con rol `cliente` no puede agregar ítems al catálogo.
+
 ## Modelo y reglas principales
 
 ```text
