@@ -31,6 +31,22 @@ class prestamoService {
       const nombreItem = item ? `"${item.titulo}"` : 'solicitado';
       throw new Error(`No hay stock disponible del ítem ${nombreItem}.`);
     }
+    // 1. Verificar que el cliente no tenga ya un préstamo activo de este mismo ítem
+    const yaTieneEsteItem = this.prestamos.some(
+      (p) => p.usuario.id === usuario.id && p.item.id === item.id && p.estado === 'activo'
+    );
+    if (yaTieneEsteItem) {
+      throw new Error(`Ya tenés un préstamo activo de "${item.titulo}". Debés devolverlo antes de volver a pedirlo.`);
+    }
+
+    // 2. Verificar que el cliente no supere el límite máximo de préstamos activos (ej: 3)
+    const LIMITE_PRESTAMOS_ACTIVOS = 3;
+    const activosDelUsuario = this.prestamos.filter(
+      (p) => p.usuario.id === usuario.id && p.estado === 'activo'
+    );
+    if (activosDelUsuario.length >= LIMITE_PRESTAMOS_ACTIVOS) {
+      throw new Error(`Alcanzaste el límite máximo de ${LIMITE_PRESTAMOS_ACTIVOS} préstamos activos en simultáneo.`);
+    }
 
     // Aplica efecto en el dominio
     item.descontarStock();
