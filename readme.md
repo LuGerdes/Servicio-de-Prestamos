@@ -82,7 +82,8 @@ cd ..
 Desde la raíz del proyecto, iniciar la API:
 
 ```bash
-npm start
+cd backend
+node src/server.js
 ```
 
 El backend queda disponible en:
