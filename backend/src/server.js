@@ -16,7 +16,7 @@ const prestamoService = new PrestamoService();
 
 // Datos iniciales de prueba
 const admin = new Usuario(1, 'Admin General', 'admin@mail.com', 'admin');
-const cliente = new Usuario(2, 'Lourdes', 'lourdes@mail.com', 'cliente');
+const cliente = new Usuario(2, 'juana', 'juana@mail.com', 'cliente');
 usuarioService.registrarUsuario(admin);
 usuarioService.registrarUsuario(cliente);
 

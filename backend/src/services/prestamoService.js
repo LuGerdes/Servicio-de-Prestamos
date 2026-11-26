@@ -19,20 +19,22 @@ class prestamoService {
    * @returns {Prestamo}
    */
   solicitarPrestamo(usuario, item) {
-    if (!usuario) {
-      throw new Error('Debe indicarse un usuario válido para realizar el préstamo.');
+    // 1. Evitar que el cliente pida dos ejemplares activos del mismo ítem
+    const yaTieneEsteItem = this.prestamos.some(
+      (p) => p.usuario.id === usuario.id && p.item.id === item.id && p.estado === 'activo'
+    );
+    if (yaTieneEsteItem) {
+      throw new Error(`Ya tenés un préstamo activo de "${item.titulo}". Debés devolverlo antes de volver a pedirlo.`);
     }
 
-    if (usuario.esAdmin()) {
-      throw new Error('Los administradores no pueden retirar préstamos a su nombre.');
+    // 2. Limitar a un máximo de 3 préstamos activos en simultáneo
+    const LIMITE_PRESTAMOS_ACTIVOS = 3;
+    const activosDelUsuario = this.prestamos.filter(
+      (p) => p.usuario.id === usuario.id && p.estado === 'activo'
+    );
+    if (activosDelUsuario.length >= LIMITE_PRESTAMOS_ACTIVOS) {
+      throw new Error(`Alcanzaste el límite máximo de ${LIMITE_PRESTAMOS_ACTIVOS} préstamos activos en simultáneo.`);
     }
-
-    if (!item || !item.hayDisponibilidad()) {
-      const nombreItem = item ? `"${item.titulo}"` : 'solicitado';
-      throw new Error(`No hay stock disponible del ítem ${nombreItem}.`);
-    }
-
-    // Aplica efecto en el dominio
     item.descontarStock();
 
     // Crea el registro del préstamo (aplica polimórficamente los días del ítem)

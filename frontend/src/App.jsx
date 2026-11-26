@@ -56,7 +56,7 @@ function App() {
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
       <h1>Servicio de Préstamos</h1>
-      <p>Usuario activo: <strong>Lourdes (Cliente)</strong></p>
+      <p>Usuario activo: <strong> (Cliente)</strong></p>
 
       {mensaje && (
         <div style={{ padding: '0.75rem', marginBottom: '1rem', background: '#2d3748', color: '#fff', borderRadius: '6px' }}>
