@@ -62,7 +62,7 @@ npm --version
 Clonar el repositorio y ubicarse en la carpeta principal:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone <https://github.com/LuGerdes/Servicio-de-Prestamos>
 cd Servicio-de-Prestamos
 npm install
 ```
