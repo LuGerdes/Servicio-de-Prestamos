@@ -62,7 +62,7 @@ npm --version
 Clonar el repositorio y ubicarse en la carpeta principal:
 
 ```bash
-git clone <https://github.com/LuGerdes/Servicio-de-Prestamos>
+git clone https://github.com/LuGerdes/Servicio-de-Prestamos
 cd Servicio-de-Prestamos
 npm install
 ```
@@ -184,19 +184,38 @@ El frontend está dividido entre componentes React, estilos y recursos estático
 
 ```text
 Servicio-de-Prestamos/
-├── src/
-│   ├── index.js
-│   ├── server.js
-│   ├── models/
-│   ├── services/
-│   └── tests/
+├── backend/
+│   └── src/
+│       ├── models/
+│       │   ├── itemFactory.js
+│       │   ├── items.js
+│       │   ├── juegoDeMesa.js
+│       │   ├── libro.js
+│       │   ├── prestamo.js
+│       │   └── usuario.js
+│       ├── services/
+│       │   ├── catalogoService.js
+│       │   ├── prestamoService.js
+│       │   └── usuarioService.js
+│       ├── tests/
+│       │   ├── CatalogoService.test.js
+│       │   └── PrestamoService.test.js
+│       ├── index.js
+│       └── server.js
+├── docs/
+│   └── markdown.md
 ├── frontend/
-│   ├── src/
 │   ├── public/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   └── main.jsx
 │   ├── index.html
 │   └── package.json
-├── docs/
+├── .env.example
+├── .gitignore
+├── eslint.config.mjs
 ├── package.json
+├── package-lock.json
 └── readme.md
 ```
 
