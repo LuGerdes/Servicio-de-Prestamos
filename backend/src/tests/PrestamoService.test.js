@@ -33,12 +33,14 @@ describe('Pruebas unitarias sobre PrestamoService', () => {
   });
 
   test('Debe arrojar un error de dominio si se intenta prestar un ítem sin stock', () => {
+    const otroSocio = new Usuario(11, 'Luis Pérez', 'luis@mail.com', 'cliente');
+
     // Primer préstamo consume la única unidad disponible
     prestamoService.solicitarPrestamo(socio, juego);
 
-    // Segundo intento debe lanzar la excepción
+    // Otro socio intenta pedirlo cuando el stock ya está en 0
     expect(() => {
-      prestamoService.solicitarPrestamo(socio, juego);
+      prestamoService.solicitarPrestamo(otroSocio, juego);
     }).toThrow(/No hay stock disponible/);
   });
 
