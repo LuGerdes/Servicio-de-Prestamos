@@ -13,7 +13,7 @@ export default [
   },
   {
     // Configuración específica para los tests de Jest
-    files: ["src/tests/**/*.js"],
+    files: ["backend/src/tests/**/*.js"],
     languageOptions: {
       globals: {
         ...globals.jest,

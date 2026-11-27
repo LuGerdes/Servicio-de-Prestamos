@@ -19,6 +19,12 @@ class prestamoService {
    * @returns {Prestamo}
    */
   solicitarPrestamo(usuario, item) {
+    if (!usuario) {
+      throw new Error('Debe indicarse un usuario válido para realizar el préstamo.');
+    }
+    if (usuario.esAdmin()) {
+      throw new Error('Los administradores no pueden retirar préstamos a su nombre.');
+    }
     // 1. Evitar que el cliente pida dos ejemplares activos del mismo ítem
     const yaTieneEsteItem = this.prestamos.some(
       (p) => p.usuario.id === usuario.id && p.item.id === item.id && p.estado === 'activo'
