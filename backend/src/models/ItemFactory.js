@@ -23,7 +23,6 @@ class ItemFactory {
         );
 
       case 'juego':
-      case 'juegodemesa':
         // Constructor de JuegoDeMesa: (id, titulo, descripcion, stock, caracteristicas, edadMinima, cantidadJugadores)
         return new JuegoDeMesa(
           datos.id,
