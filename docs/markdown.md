@@ -1,59 +1,61 @@
-# Decisiones de diseño del sistema de préstamos
+# Decisiones de diseño y calidad del sistema de préstamos
 
 ## 1. ¿Qué partes revisamos?
 
-Revisamos los modelos, los servicios, el inicio del programa y las pruebas. El sistema permite registrar usuarios, cargar libros y juegos de mesa, solicitar préstamos y registrar devoluciones.
+Revisamos los modelos, los servicios, los puntos de entrada del programa y las pruebas automatizadas del backend. El sistema permite registrar usuarios, cargar libros y juegos de mesa, solicitar préstamos y registrar devoluciones.
 
 ## 2. ¿Cómo está organizado el código?
 
-- `Usuario` guarda los datos del usuario y permite saber si es administrador o cliente.
-- `Item` guarda los datos comunes de los ítems y permite revisar, descontar y reponer el stock.
-- `Libro` y `JuegoDeMesa` heredan de `Item`. El plazo de préstamo es de 15 días para un libro y de 5 días para un juego.
-- `Prestamo` guarda los datos del préstamo, calcula la fecha límite y registra la devolución. Al devolver un ítem, también repone su stock.
-- `CatalogoService` administra los ítems. Solo un administrador puede agregar ítems y no permite repetir sus IDs.
-- `UsuarioService` registra, busca y elimina usuarios. Solo un administrador puede listar o eliminar usuarios.
-- `PrestamoService` valida los préstamos, controla el stock y permite consultar préstamos según el rol del usuario.
+- `Usuario`: guarda los datos del usuario y permite saber si tiene rol de administrador (`admin`) o cliente (`cliente`).
+- `Item`: guarda los datos comunes de los ítems y permite revisar, descontar y reponer el stock.
+- `Libro` y `JuegoDeMesa`: heredan de `Item`. El plazo de préstamo es de 15 días para un libro y de 5 días para un juego.
+- `Prestamo`: guarda los datos del préstamo, calcula la fecha límite y registra la devolución. Al devolver un ítem, también repone su stock.
+- `CatalogoService`: administra los ítems. Solo un administrador puede agregar ítems y no permite repetir sus IDs.
+- `UsuarioService`: registra, busca y elimina usuarios. Solo un administrador puede listar o eliminar usuarios.
+- `PrestamoService`: valida las reglas de negocio de los préstamos (usuario válido, rol cliente, sin préstamos duplicados del mismo ítem, tope de 3 préstamos activos y stock disponible), controla el inventario y permite consultar préstamos según el rol del usuario.
 
 ## 3. ¿Por qué usamos `ItemFactory`?
 
-`ItemFactory` crea libros y juegos de mesa según el tipo recibido. Así, `CatalogoService` no tiene que decidir por su cuenta qué clase crear.
+- **Diagnóstico:** `CatalogoService` necesitaba instanciar distintos tipos de ítems (`Libro` o `JuegoDeMesa`) a partir de un parámetro de tipo, lo que generaba acoplamiento directo del servicio con las clases concretas.
+- **Alternativas evaluadas:**
+  - *Conservar lo actual:* Dejar condicionales `if/else` directos dentro de `CatalogoService`. Se descartó para no mezclar la lógica de gestión del catálogo con los detalles de instanciación.
+  - *Patrón Builder:* Se descartó porque los ítems tienen atributos simples y no requieren una construcción compleja paso a paso.
+  - *Patrón Factory (`ItemFactory`):* Opción elegida.
+- **Decisión:** `ItemFactory` centraliza la creación de libros y juegos de mesa según el tipo recibido (`libro`, `juego` o `juegodemesa`). Si recibe otro tipo, lanza un error controlado. Si más adelante agregamos otro tipo de ítem, solo habrá que crear su clase y actualizar la Factory.
 
-La Factory acepta los tipos `libro`, `juego` y `juegodemesa`. Si recibe otro tipo, muestra un error. Si más adelante agregamos otro tipo de ítem, habrá que agregar su clase y modificar la Factory.
+## 4. Otras decisiones de diseño y alternativas descartadas
 
-## 4. ¿Qué decisiones tomamos?
+- **No usamos Singleton:** Aunque `backend/src/index.js` y `backend/src/server.js` crean una instancia de cada servicio, las clases no restringen la creación de nuevas instancias. Esto facilita aislar cada caso de prueba en Jest sin arrastrar estado global entre tests.
+- **No usamos un repositorio compartido ni inyección de dependencias compleja entre servicios:** Cada servicio administra su propia colección en memoria. `PrestamoService` recibe directamente las instancias de `usuario` e `item` al solicitar un préstamo.
+- **Reglas de negocio en `PrestamoService`:** Evaluamos mantener una versión inicial con validaciones básicas frente a incorporar restricciones reales del dominio. Decidimos agregar el límite máximo de 3 préstamos activos en simultáneo y el bloqueo de préstamos duplicados de un mismo ítem para evitar inconsistencias de negocio.
+- **No agregamos otros patrones** como Builder, Adapter, Facade, Decorator, Strategy, Observer o Command. Con el alcance actual, las reglas se resuelven de forma clara con los modelos y servicios existentes sin introducir capas innecesarias.
 
-- **Usamos una Factory para crear los ítems.** Mantiene esa decisión en un solo lugar.
-- **No usamos Singleton.** Aunque `src/index.js` crea una instancia de cada servicio, el programa no impide que se creen otras.
-- **No usamos un repositorio compartido ni inyección de dependencias entre servicios.** Cada servicio guarda su propia información en memoria. El servicio de préstamos recibe directamente el usuario y el ítem al crear un préstamo.
-- **No agregamos otros patrones** como Builder, Adapter, Facade, Decorator, Strategy, Observer o Command. Por ahora, las reglas del sistema se resuelven directamente en los modelos y servicios.
+## 5. Flujo de solicitud y devolución de un préstamo
 
-## 5. ¿Qué pasa cuando se solicita y se devuelve un préstamo?
+1. Al solicitar un préstamo, `PrestamoService.solicitarPrestamo(usuario, item)` verifica que exista un usuario, que no sea administrador, que no tenga ya un préstamo activo de ese mismo ítem, que no supere el límite de 3 préstamos activos y que el ítem tenga stock disponible. Si todas las condiciones se cumplen, descuenta una unidad del stock y registra el `Prestamo`.
+2. Al devolverlo, `PrestamoService.registrarDevolucion(idPrestamo)` busca el préstamo y comprueba que siga activo. Luego `Prestamo.registrarDevolucion()` marca el estado como devuelto, registra la fecha y repone una unidad al stock del ítem.
 
-Al solicitar un préstamo, `PrestamoService` revisa que haya un usuario, que no sea administrador y que el ítem tenga stock. Si la solicitud es válida, descuenta una unidad y crea el préstamo.
+## 6. Ventajas y trade-offs
 
-Al devolverlo, el servicio busca el préstamo y comprueba que todavía esté activo. Después, `Prestamo` marca la devolución, guarda la fecha y repone una unidad al stock.
-
-## 6. Ventajas y límites
-
-| Decisión | Ventaja | Límite |
+| Decisión | Beneficio | Costo / Trade-off |
 | --- | --- | --- |
-| Usar `ItemFactory` | La creación de libros y juegos está en un solo lugar. | Para agregar otro tipo de ítem hay que modificar la Factory. |
-| Guardar los datos en memoria | El sistema es sencillo y las pruebas pueden empezar con datos limpios. | Al cerrar el programa, los datos se pierden. |
-| Resolver las reglas con los servicios y modelos actuales | No se agregan piezas que el sistema todavía no necesita. | Si las reglas crecen, habrá que revisar si conviene cambiar el diseño. |
+| Usar `ItemFactory` | Centraliza la creación de libros y juegos en un único punto y desacopla `CatalogoService`. | Para agregar un nuevo tipo de ítem hay que modificar la Factory. |
+| Guardar los datos en memoria | El sistema es simple, rápido de levantar y permite ejecutar pruebas unitarias aisladas con estado limpio. | Al reiniciar el proceso, los datos en memoria se pierden. |
+| Mantener el diseño simple sin patrones extra | Evita sobreingeniería y facilita la lectura del código. | Si las reglas de negocio o variantes de cálculo crecen mucho, habrá que refactorizar (por ejemplo, hacia Strategy). |
 
-## 7. Archivos que muestran estas decisiones
+## 7. Archivos de referencia en el repositorio
 
-- `src/models/ItemFactory.js`: crea libros y juegos de mesa.
-- `src/models/items.js`: contiene el comportamiento común de los ítems y el stock.
-- `src/models/prestamo.js`: calcula fechas y registra devoluciones.
-- `src/services/catalogoService.js`: administra el catálogo.
-- `src/services/prestamoService.js`: administra los préstamos.
-- `src/services/usuarioService.js`: administra los usuarios.
-- `src/index.js`: crea los servicios y ejecuta una demostración.
-- `src/tests/`: contiene pruebas de catálogo y préstamos.
+- `backend/src/models/ItemFactory.js`: creación centralizada de libros y juegos de mesa.
+- `backend/src/models/items.js`: comportamiento común de los ítems y control de stock.
+- `backend/src/models/prestamo.js`: cálculo de vencimientos y registro de devoluciones.
+- `backend/src/services/catalogoService.js`: administración del catálogo y validación de permisos de administrador.
+- `backend/src/services/prestamoService.js`: validaciones de dominio y gestión de préstamos y devoluciones.
+- `backend/src/services/usuarioService.js`: gestión de usuarios.
+- `backend/src/index.js` y `backend/src/server.js`: inicialización de servicios y puntos de entrada.
+- `backend/src/tests/CatalogoService.test.js` y `backend/src/tests/PrestamoService.test.js`: pruebas unitarias automatizadas.
 
-## 8. Calidad de código y limpieza
+## 8. Calidad de código, testing y automatización 
 
-Para el Taller III se incorporó ESLint como herramienta de análisis estático. La configuración se encuentra en `eslint.config.mjs` y distingue el código fuente de las pruebas de Jest.
-
-Se eliminó una importación sin uso de `Usuario` en `src/services/usuarioService.js`. Además, se amplió `src/tests/CatalogoService.test.js` con una prueba que verifica que los usuarios con rol `cliente` no puedan agregar ítems al catálogo.
+- **Análisis estático con ESLint:** Se configuró ESLint en `eslint.config.mjs` (en la raíz del repositorio) diferenciando las reglas globales de Node.js para el código fuente y las de Jest para `backend/src/tests/**/*.js`. Al ejecutarlo, se detectó y eliminó código muerto (una importación sin uso de `Usuario` en `backend/src/services/usuarioService.js`).
+- **Testing automatizado basado en riesgo:** Se implementaron pruebas unitarias con Jest sobre los servicios críticos del negocio (`CatalogoService` y `PrestamoService`), cubriendo casos normales, casos límite (dejar stock en 0 tras prestar la última unidad) y casos de error (rechazar préstamos sin stock, bloquear préstamos a administradores e impedir que un cliente modifique el catálogo).
+- **Automatización de tareas:** En `package.json` se centralizaron los comandos repetitivos (`npm start`, `npm test`, `npm run lint` y `npm run check`, que ejecuta ESLint y Jest de forma encadenada) para estandarizar la verificación de calidad antes de integrar cambios.
